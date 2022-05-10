@@ -9,6 +9,59 @@
   assumenda nisi porro debitis a consequatur? Veniam quasi at aperiam?
 </p>
 
+<!-- Calendly inline widget begin -->
+
+<div class="calendly-inline-widget" style="min-width:320px;height:700px;" data-auto-load="false">
+  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js"></script>
+  <script>
+  Calendly.initInlineWidget({
+  url: 'https://calendly.com/alephteam/student-assessment-meeting'
+  });
+  </script>
+  </div>
+
+  <!-- Calendly inline widget end -->
+
+  
+
 <a href="{{ url_for('carddetails')}}" class="btn btn-success">Start Payment</a>
+
+{% endblock %}
+
+{% block extra_js %}
+
+<script>
+  function isCalendlyEvent(e) {
+    return e.origin === "https://calendly.com" && e.data.event && e.data.event.indexOf("calendly.") === 0;
+  };
+  
+  window.addEventListener("message", function(e) {
+    if(isCalendlyEvent(e)) {
+      /* Example to get the name of the event */
+      console.log("Event name:", e.data.event);
+      console.log("All event.data", e.data);
+  
+      /* Example to get the payload of the event */
+      console.log("Event details:", e.data.payload);
+
+      // checks to see if an appointment is scheduled 
+      if(e.data.event === "calendly.event_scheduled"){
+
+        // extracts the uri/url from the 
+        const bookingUrl = e.data.payload.event.uri; 
+
+        let request = new XMLHttpRequest;
+
+        request.open('POST', `/get-calendly/`, true);
+        request.setRequestHeader('Content-Type', "application/json");
+        const data = {
+          'booking_url': bookingUrl
+        }
+        request.send(JSON.stringify(data))
+
+      }
+    }
+  });
+</script>
 
 {% endblock %}
